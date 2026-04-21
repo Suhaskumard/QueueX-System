@@ -1,44 +1,41 @@
-````markdown
 # QueueMind
 
 QueueMind is a distributed task queue demo built with a FastAPI backend and a real-time React dashboard. It simulates a multi-agent processing pipeline where workloads are planned, scheduled, assigned to workers, executed, validated, retried when necessary, and streamed live to the UI via WebSockets.
 
-This project is designed to demonstrate queue orchestration, worker health monitoring, retry mechanisms, live metrics, and task inspection—without requiring a full production infrastructure.
+This project demonstrates queue orchestration, worker health monitoring, retry mechanisms, live metrics, and task inspection—without requiring a full production infrastructure.
 
 ---
 
 ## Features
 
-- Multi-agent orchestration:
-  planner, scheduler, load balancer, workers, critic, retry agent, and monitor
-- Real-time dashboard:
-  task counts, pipeline progress, worker health, logs, and metrics
-- Workload submission API with built-in demo workload
-- In-memory development mode for fast local execution
-- Kafka-based worker mode using Docker Compose
-- Automatic retry handling with configurable failure rates and retry limits
-- Task detail view for inspecting results and errors
+* Multi-agent orchestration: planner, scheduler, load balancer, workers, critic, retry agent, and monitor
+* Real-time dashboard with task counts, pipeline progress, worker health, logs, and metrics
+* Workload submission API with a built-in demo workload
+* In-memory development mode for fast local execution
+* Kafka-based worker mode using Docker Compose
+* Automatic retry handling with configurable failure rates and retry limits
+* Task detail view for inspecting results and errors
 
 ---
 
 ## Tech Stack
 
-| Layer       | Technology |
-|------------|-----------|
-| Backend     | Python, FastAPI, Pydantic, Uvicorn |
-| Frontend    | React, Vite, Zustand, Recharts, Lucide React |
-| Realtime    | WebSocket |
-| Queue       | In-memory queue (dev), Kafka (container mode) |
-| Containers  | Docker Compose |
+| Layer      | Technology                                    |
+| ---------- | --------------------------------------------- |
+| Backend    | Python, FastAPI, Pydantic, Uvicorn            |
+| Frontend   | React, Vite, Zustand, Recharts, Lucide React  |
+| Realtime   | WebSocket                                     |
+| Queue      | In-memory queue (dev), Kafka (container mode) |
+| Containers | Docker Compose                                |
 
 ---
 
 ## Prerequisites
 
-- Python 3.12+
-- Node.js 20+
-- npm
-- Docker Desktop (only for Kafka mode)
+* Python 3.12 or newer
+* Node.js 20 or newer
+* npm
+* Docker Desktop (only for Kafka mode)
 
 ---
 
@@ -67,7 +64,7 @@ QueueMind/
 
   docker-compose.yml
   README.md
-````
+```
 
 ---
 
@@ -158,18 +155,18 @@ curl -X POST http://localhost:8000/api/demo
 
 ## API Reference
 
-| Method | Endpoint               | Description            |
-| ------ | ---------------------- | ---------------------- |
-| POST   | `/api/workloads`       | Submit custom workload |
-| POST   | `/api/demo`            | Run demo workload      |
-| GET    | `/api/tasks`           | List tasks             |
-| GET    | `/api/tasks/{task_id}` | Get task details       |
-| GET    | `/api/workers`         | Worker status          |
-| GET    | `/api/metrics`         | Metrics summary        |
-| GET    | `/api/summary`         | System overview        |
-| GET    | `/api/logs`            | Event logs             |
-| GET    | `/api/failures`        | Failure logs           |
-| WS     | `/ws`                  | Live event stream      |
+| Method | Endpoint               | Description              |
+| ------ | ---------------------- | ------------------------ |
+| POST   | `/api/workloads`       | Submit a custom workload |
+| POST   | `/api/demo`            | Run demo workload        |
+| GET    | `/api/tasks`           | List all tasks           |
+| GET    | `/api/tasks/{task_id}` | Get task details         |
+| GET    | `/api/workers`         | Worker status            |
+| GET    | `/api/metrics`         | Metrics summary          |
+| GET    | `/api/summary`         | System overview          |
+| GET    | `/api/logs`            | Event logs               |
+| GET    | `/api/failures`        | Failure logs             |
+| WS     | `/ws`                  | Live event stream        |
 
 ---
 
@@ -190,7 +187,7 @@ curl -X POST http://localhost:8000/api/workloads \
 
 ## Configuration
 
-Environment variables control backend behavior:
+The backend reads configuration from environment variables.
 
 | Variable                | Default        | Description                         |
 | ----------------------- | -------------- | ----------------------------------- |
@@ -209,20 +206,20 @@ Environment variables control backend behavior:
 
 ## Docker Setup
 
-Run full Kafka-based system:
+Run the full Kafka-based system:
 
 ```bash
 docker compose up --build
 ```
 
-Includes:
+This starts:
 
 * Kafka (KRaft mode)
 * FastAPI orchestrator
-* CPU workers
-* IO workers
+* CPU worker containers
+* IO worker containers
 
-⚠️ Frontend is not included — run separately.
+⚠️ The frontend is not included in Docker Compose. Run it separately.
 
 ---
 
@@ -254,8 +251,21 @@ python backend/scripts/healthcheck.py
 ## Notes
 
 * In-memory mode resets all data on restart
-* Root endpoint `/` is not defined
+* The root endpoint `/` is not defined
 * Default endpoints:
 
   * API → `http://localhost:8000`
   * WebSocket → `ws://localhost:8000/ws`
+
+---
+
+## 👨‍💻 Team
+
+* **Madhavi** – Backend & UI Development
+* **Suhas Kumar** – Frontend & System Design
+
+---
+
+## License
+
+No license has been specified yet. Add one before publishing.
