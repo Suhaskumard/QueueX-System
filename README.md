@@ -266,6 +266,3 @@ python backend/scripts/healthcheck.py
 
 ---
 
-## License
-
-No license has been specified yet. Add one before publishing.
