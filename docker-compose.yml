@@ -1,0 +1,137 @@
+version: "3.9"
+
+networks:
+  queuemind-net:
+    driver: bridge
+
+volumes:
+  kafka-data:
+
+services:
+
+  # ── Kafka (KRaft mode — no Zookeeper) ─────────────────────────────
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: queuemind-kafka
+    hostname: kafka
+    networks: [queuemind-net]
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:29093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:29093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  # ── FastAPI Orchestrator ───────────────────────────────────────────
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: queuemind-api
+    networks: [queuemind-net]
+    ports:
+      - "8000:8000"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      QUEUEMIND_MODE: prod
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      NUM_CPU_WORKERS: 2
+      NUM_IO_WORKERS: 2
+      WORKER_FAILURE_RATE: 0.15
+      HOST: "0.0.0.0"
+      PORT: "8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/metrics"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  # ── CPU Workers (×2) ──────────────────────────────────────────────
+  worker-cpu-1:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: queuemind-worker-cpu-1
+    networks: [queuemind-net]
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      QUEUEMIND_MODE: prod
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      WORKER_FAILURE_RATE: 0.15
+    command: ["python", "worker_entrypoint.py", "--type", "cpu", "--id", "worker_cpu_1"]
+    restart: unless-stopped
+
+  worker-cpu-2:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: queuemind-worker-cpu-2
+    networks: [queuemind-net]
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      QUEUEMIND_MODE: prod
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      WORKER_FAILURE_RATE: 0.15
+    command: ["python", "worker_entrypoint.py", "--type", "cpu", "--id", "worker_cpu_2"]
+    restart: unless-stopped
+
+  # ── IO Workers (×2) ───────────────────────────────────────────────
+  worker-io-1:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: queuemind-worker-io-1
+    networks: [queuemind-net]
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      QUEUEMIND_MODE: prod
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      WORKER_FAILURE_RATE: 0.15
+    command: ["python", "worker_entrypoint.py", "--type", "io", "--id", "worker_io_1"]
+    restart: unless-stopped
+
+  worker-io-2:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: queuemind-worker-io-2
+    networks: [queuemind-net]
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      QUEUEMIND_MODE: prod
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      WORKER_FAILURE_RATE: 0.15
+    command: ["python", "worker_entrypoint.py", "--type", "io", "--id", "worker_io_2"]
+    restart: unless-stopped
