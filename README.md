@@ -259,5 +259,3 @@ python backend/scripts/healthcheck.py
 
   * API → `http://localhost:8000`
   * WebSocket → `ws://localhost:8000/ws`
-
----
