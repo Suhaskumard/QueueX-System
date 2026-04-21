@@ -261,9 +261,3 @@ python backend/scripts/healthcheck.py
   * WebSocket → `ws://localhost:8000/ws`
 
 ---
-
-## License
-
-No license specified. Add one before publishing.
-
-```
