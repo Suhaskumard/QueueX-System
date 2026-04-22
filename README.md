@@ -260,6 +260,7 @@ python backend/scripts/healthcheck.py
 ---
 
 ## 👨‍💻 Team
+* **Madhavi** - Backend Designer
 * **Suhas Kumar** – Frontend & System Design
 
 ---
