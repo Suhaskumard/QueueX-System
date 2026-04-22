@@ -1,0 +1,19 @@
+http:
+  routers:
+    linkloom-api:
+      rule: "PathPrefix(`/`)"
+      service: linkloom-api-service
+      middlewares:
+        - rate-limit-post
+
+  services:
+    linkloom-api-service:
+      loadBalancer:
+        servers:
+          - url: "http://api:8080"
+
+  middlewares:
+    rate-limit-post:
+      rateLimit:
+        average: 60
+        burst: 10
